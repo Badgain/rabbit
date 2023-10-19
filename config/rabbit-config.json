@@ -1,0 +1,40 @@
+{
+  "message_types" : [
+    {
+      "exchange" : "string",
+      "routing_key" : "string",
+      "mandatory" :  true,
+      "immediate" :  true,
+      "contentType": "string"
+    }
+  ],
+  "exchanges" : [
+    {
+      "name" : "exchanges-name",
+      "type" : "some-kind",
+      "is_durable" : true,
+      "auto_delete" : false,
+      "is_internal" : false,
+      "no_wait" : false
+    }
+  ],
+  "queues" : [
+    {
+      "queue" : "some-queue",
+      "auto_ack" : true,
+      "consumer" : "",
+      "is_exclusive" : false,
+      "no_local" : false,
+      "no_wait" : false
+    }
+  ],
+  "consumers" : [
+    {
+      "queue_name" : "some-topic",
+      "durable" : false,
+      "delete_when_unused" : false,
+      "is_exclusive" : false,
+      "no_wait" : false
+    }
+  ]
+}

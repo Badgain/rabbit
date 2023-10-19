@@ -2,67 +2,55 @@ package consumer
 
 import (
 	"errors"
-	"log"
-	"rabbit/types"
-	"rabbit/utils"
-
 	amqp "github.com/rabbitmq/amqp091-go"
+	"go.uber.org/zap"
+	"log"
+	"rabbit/config"
+	"rabbit/types"
 )
-
-type ConsumerParams struct {
-	Name             string
-	Durable          bool
-	DeleteWhenUnused bool
-	Exclusive        bool
-	NoWait           bool
-	Args             amqp.Table
-}
-
-type QueueOptions struct {
-	Queue     string
-	Consumer  string
-	AutoAck   bool
-	Exclusive bool
-	NoLocal   bool
-	NoWait    bool
-	Args      amqp.Table
-}
 
 type Consumer interface {
 	Consume() error
-	SetHandler(types.MessageHandler)
+	Subscribe(types.MessageHandler) *consumer
 	Kill() error
 }
 
 type consumer struct {
 	ch      *amqp.Channel
 	queue   amqp.Queue
-	opts    QueueOptions
+	opts    *config.QueueConfig
 	msgs    <-chan amqp.Delivery
 	ready   bool
 	handler types.MessageHandler
+	logger  *zap.Logger
 }
 
-func NewConsumer(ch *amqp.Channel, params ConsumerParams, queueOpts QueueOptions) Consumer {
+func NewConsumer(ch *amqp.Channel, consumerConf *config.ConsumerConfig, queueConf *config.QueueConfig, logger *zap.Logger) (Consumer, error) {
 	q, err := ch.QueueDeclare(
-		params.Name,
-		params.Durable,
-		params.DeleteWhenUnused,
-		params.Exclusive,
-		params.NoWait,
-		params.Args,
+		consumerConf.Name,
+		consumerConf.Durable,
+		consumerConf.DeleteWhenUnused,
+		consumerConf.IsExclusive,
+		consumerConf.NoWait,
+		nil,
 	)
-	utils.FailHandler(err, "Failed to declare a queue")
-	return &consumer{
-		ch:    ch,
-		queue: q,
-		opts:  queueOpts,
-		ready: false,
+	if err != nil {
+		logger.Sugar().Errorw("Failed to declare a queue", err)
+		return nil, err
 	}
+
+	return &consumer{
+		ch:     ch,
+		queue:  q,
+		opts:   queueConf,
+		ready:  false,
+		logger: logger,
+	}, nil
 }
 
-func (c *consumer) SetHandler(h types.MessageHandler) {
+func (c *consumer) Subscribe(h types.MessageHandler) *consumer {
 	c.handler = h
+	return c
 }
 
 func (c *consumer) Consume() error {
@@ -74,10 +62,10 @@ func (c *consumer) Consume() error {
 		c.opts.Queue,
 		c.opts.Consumer,
 		c.opts.AutoAck,
-		c.opts.Exclusive,
+		c.opts.IsExclusive,
 		c.opts.NoLocal,
 		c.opts.NoWait,
-		c.opts.Args,
+		nil,
 	)
 	if err != nil {
 		return err
