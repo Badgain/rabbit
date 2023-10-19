@@ -3,13 +3,13 @@ package rabbit
 import (
 	"errors"
 	"fmt"
+	"github.com/Badgain/rabbit/config"
+	rconf "github.com/Badgain/rabbit/config"
+	"github.com/Badgain/rabbit/consumer"
+	"github.com/Badgain/rabbit/producer"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 	"log"
-	"rabbit/config"
-	rconf "rabbit/config"
-	"rabbit/consumer"
-	"rabbit/producer"
 	"sync"
 
 	amqp "github.com/rabbitmq/amqp091-go"

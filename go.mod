@@ -1,4 +1,4 @@
-module rabbit
+module github.com/Badgain/rabbit
 
 go 1.18
 

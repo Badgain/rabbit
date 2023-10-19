@@ -2,9 +2,9 @@ package producer
 
 import (
 	"context"
+	"github.com/Badgain/rabbit/config"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"go.uber.org/zap"
-	"rabbit/config"
 )
 
 type Producer interface {

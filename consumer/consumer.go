@@ -2,11 +2,11 @@ package consumer
 
 import (
 	"errors"
+	"github.com/Badgain/rabbit/config"
+	"github.com/Badgain/rabbit/types"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"go.uber.org/zap"
 	"log"
-	"rabbit/config"
-	"rabbit/types"
 )
 
 type Consumer interface {
