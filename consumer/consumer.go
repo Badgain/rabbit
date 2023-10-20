@@ -73,7 +73,7 @@ func (c *consumer) Consume() error {
 
 	go func() {
 		for d := range msgs {
-			c.handler.Handle(d)
+			c.handler(d)
 		}
 	}()
 
